@@ -1,0 +1,306 @@
+---
+title: "R Tutorial"
+
+#output: html_document
+output: pdf_document
+---
+
+R is an _open source_ software for statistical analysis, computing, and graphics [http://cran.r-project.org/](http://cran.r-project.org/). It provides a software environment where data, results, and functions are treated as objects. The users can interact directly with these objects at the command prompt. A comprehensive online introduction to R is available at [http://cran.r-project.org/doc/manuals/R-intro.html](http://cran.r-project.org/doc/manuals/R-intro.html). Sections 2 to 9 are particularly useful if you are not familiar with R.  R is a great tool to conduct analyses in a reproducible manner. R studio is a very helpful application that provides an easy interface to R, where you can create text files that conduct and document your analysis [http://www.rstudio.com/](http://www.rstudio.com/).
+
+We will illustrate some basic operations using a dataset of daily ambient ozone concentrations and temperature in 3 Georgia counties between March and November 2000. Please download the `ozoneATL_2000.csv` and `OzoneATL_2000.RData`. You will also need to change the path names to get the code to run (as indicated below). 
+
+
+# Installing R Packages
+R packages are bundles of code creating functions that do not exist in basic R (to analyze or plot data). There are thousands of them, but a few main ones will meet many of your needs. Additional ones can be found online.
+
+**(Option 1)** Identify the package name & download it. 
+
+```{r, eval=FALSE}
+install.packages("ggplot2") 
+library(ggplot2)
+```
+
+**(Option 2)** Have RStudio do everything for you: Search for the package & click Install. Once it is installed, check the box in the package list. 
+
+
+# How to read in a dataset?
+**(Option 1)** To read in a comma-separated (.csv) file, use the read.csv function. If you launched this tutorial by clicking on M0_R_Overview.Rproj, this should work:  
+
+```{r, eval=TRUE}
+
+data <- read.csv ("ozoneATL_2000.csv")
+```
+
+Here we read in a csv file (`ozoneATL_2000.csv`) and assign it to an object called `data` using the right arrow (`<-`) operator. The equal sign (`=`) also works for assigning objects. If we are using R projects, then the working directory will be set to the directory containing the .Rproj file. Let's check which working directory we are using:
+```{r}
+getwd()
+```
+
+
+# Working with R Data Frame
+Here are some functions that describe a dataset. 
+```{r, eval=TRUE}
+dim (data) #Print the dimension (row by column) of a dataset
+names (data) #Print the variable names
+```
+
+Here we see that the data frame has 3 variables and 724 records. The function `str( )` prints the structure of an object, here the variable names, their classes, and the first few records.
+```{r, eval=TRUE}
+str (data) #Print the variable's classes and give examples
+```
+
+The above shows that the first two variables (TEMP) and (Ozone) are numerical values, while the third variable (COUNTY) is a _factor_. COUNTY is a categorical variable for the three counties (Cobb, DeKalb, and Fulton).
+
+We can quickly view the data in R studio by clicking on the dataset’s name in the “Environment” window.
+
+We can also use the function `summary ( )` to calculate some summary statistics for each variable. Note that for COUNTY, we see the frequency count for each categorical group. This function is also very useful to see whether R read-in the variables as continuous or categorical.
+```{r, eval=TRUE}
+summary (data)
+```
+
+There are several ways to extract elements from a data frame. One approach is to use the square brackets, _[row numbers, column numbers]_.  For example, to get the first row or the first three rows: 
+```{r, eval=TRUE}
+data[1, ]   # First row of the dataset
+data[1:3, ] # First three rows of the data set. Here the colon indicates “to”
+data[ ,2]   # Second column (too much to print)
+data[2,2]   # Second row, second column
+```
+
+Because a data frame contains variable names, we can also directly extract a variable (all records) by using the dollar (`$`) sign. 
+```{r, eval=TRUE}
+ozone = data$Ozone
+class (ozone)
+dim(ozone)
+length(ozone)
+ozone[1:4]
+```
+
+In the above operations, a new object _ozone_ is defined and takes the values of the variable “Ozone” in the data frame. Note that ozone is a _vector_ of class numeric. It has NULL dimension but a vector of length 724. 
+
+Here are some example functions to calculate simple statistical summaries of a variable: 
+```{r, eval=TRUE}
+median (data$Ozone)
+quantile (data$Ozone, .50)
+sd (data$Ozone)
+max (data$Ozone)
+```
+
+## Creating New Variables 
+It is easy to define new variables in a data frame. For example, we can create a new variable called “LogOzone” as the log of daily ozone concentrations using
+
+```{r, eval=TRUE}
+data$LogOzone = log (data$Ozone)
+data[1:2,]
+```
+
+To remove a variable, we can use a “minus” operation in the square bracket
+```{r, eval=TRUE}
+data = data[,-4]
+data[1:2,]
+```
+
+# Vectors
+In R, a sequence of numbers and characters can be stored in a vector. The function `c( )`, for combining, is used to create a vector.  For example,
+```{r}
+x = c(1, 3, 5, 6)
+y = c("a", "b", "c")
+class (x)
+class (y)
+```
+
+R has several functions to create structured vectors: `seq( )` for consecutive elements; `rep( )` for repeating elements. Element-by-element arithmetic operations are available to the vectors. 
+```{r}
+x + x
+x*x
+x^2
+```
+
+# Matrix
+R can also store data in blocks as a matrix. 
+```{r}
+x = matrix (c(1,2,3,4, 5, 6), nrow = 2, ncol = 3)
+x
+class(x)
+```
+
+Note that the default is to fill a matrix by column. You can use the option “`by.row = TRUE`”
+```{r}
+x = matrix (c(1,2,3,4, 5, 6), nrow = 2, ncol = 3, byrow = T)
+x
+```
+
+Functions such as `dim( )`, `nrow( )`, `ncol( )` can be used to obtain dimensions of a matrix. Elements of a matrix can also be extracted using the square bracket notations. Common matrix operations include transpose `t( )`, multiplication `%*%`, inverse `solve( )`, diagonal elements `diag( )`. You can also perform element-by-element arithmetic operations. 
+
+```{r}
+t(x)
+x%*%t(x)
+solve (x%*%t(x))
+x-1
+```
+
+Note how the last operation below subtracts 1 from _every_ element. This is an example of R’s “recycling” behavior, which makes it fast to program, but the results are not always intuitive. For example:
+```{r}
+x - c(1,2)
+```
+
+Whereas
+```{r}
+x - c(1,2,3)
+```
+
+subtracts c(1,2,3) from the vectorized “x”, which here is equivalent to 1 from x[1,1], 2 from x[1,2], and 3 from x[2,1], then R “recycles” c(1,2,3), i.e., 1 from x[2,2], 2 from x[1,3], and 3 from x[2,3]. See what happens with the following code:
+```{r}
+x - c(1,2,3,4,5)
+```
+
+# Factors
+R stores categorical variables as factors and represent each group as a _level_.  A factor is stored as a numeric integer with a character label, which is more memory efficient. When R reads in a CSV file, it will automatically convert variables with character values into a factor.
+```{r, eval=TRUE}
+county = data$COUNTY
+class(county)
+levels (county)
+table (county)
+```
+
+# Plotting in R
+The function `plot` will produce a scatter plot of two variables. The following two commands all produce the same plot of daily ozone levels versus daily temperature.
+```{r, eval=TRUE}
+plot (data$Ozone~data$TEMP)
+plot (data$TEMP, data$Ozone)
+```
+
+In R, the tilde notation (~) denotes relationship between variables. The response variable (y-axis) is given on the left of ~. If the tilde is not use, R typically interprets the first variable as the predictor (x-axis). Using the option type, the `plot` function can also be used to graph different 2-D plot. For example
+```{r, eval=TRUE}
+plot (data$Ozone~data$TEMP, type = "l") #Connect the points
+
+# sort data for more reasonable plot:
+data = data[order(data$TEMP),]
+plot (data$Ozone~data$TEMP, type = "l") #Connect the points
+
+
+plot (data$Ozone~data$TEMP, type = "h") #Show vertical lengths
+```
+
+Other useful plots include: 
+```{r, eval=TRUE}
+hist (data$Ozone)		#Plot histogram
+boxplot (data$Ozone)    #Plot boxplot 
+boxplot (data$Ozone~data$COUNTY)#Plot boxplot by county
+```
+
+
+One major advantage of R is the ability to easily customize graphics. Here is an example
+```{r, eval=TRUE}
+plot (data$Ozone~data$TEMP, 
+      cex = 0.8,   ##Size of the plot symbole
+      pch = 16, 	##Plot symbol
+      col = "forestgreen", ##plot color
+      main = "Ozone versus Temperature", ##Title text
+      xlab = "Temperature (F)", 	##X-axis text
+      ylab = "Ozone Concentration (ppm)"	##Y-axis text
+      )
+
+abline (-0.030, 0.001, ## Intercept and slope of the ozone~temp best fit line
+		    lwd = 3, ## line width
+		    col = "blue") ##line color
+```
+
+# Alternative plotting functions
+We used base R plotting functions above. Now, let's make a plot using ggplot. GGplot is a set of functions that can produce beautiful plots, although in my opinion, the syntax is a bit more difficult than the base R plots. 
+
+```{r}
+library(ggplot2)
+p<-ggplot(data, aes(x=TEMP, y=Ozone)) + geom_point(color='forestgreen') + geom_smooth()
+p
+```
+
+# Getting Help in R
+For any function in R, you can access the help file by putting a question mark (`?`) in front of the function name. For example, 
+
+```{r, eval=TRUE}
+?hist
+```
+
+RStudio contains a help area on the right side with a search function.
+
+The R help contains the following sections: 
+
+1.	Description
+2.	Usage		
+- Show all arguments (input variables) for the function and their default values.
+- These are the options that users can change 
+3.	Arguments 
+- Describes each argument and how they change the model or outputs
+4.	Details		
+- Give details on model specification, computation, and assumptions. 
+5.	Value		
+- Give available variable names that can be called via the `$` 
+- For example we can assign object _junk_ to be the outputs from the histogram
+```{r, eval=TRUE}
+junk = hist(data$Ozone)
+```
+	
+- We can then access various statistics/properties of the histogram. 
+```{r, eval=TRUE}
+junk$breaks ## the bin break points for the histogram
+```
+6.	See Also	
+  - Give other related functions
+7.	Examples
+
+# Additional information on working directories
+
+Now suppose we want to change our working directory. In this example, I have a second copy of the same ozone dataset in a different location; the point of this exercise is to provide an example of changing the working directory. 
+
+You will have to modify the code below to get this to work on your computer. 
+
+To change the working directory in an .R script, you use the following:
+```{r, eval=TRUE}
+# When you are running code in a .R file, you can use setwd:
+setwd("~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/")
+```
+In R markdown, you need to do this a special way. Details are below.
+```{r}
+require(knitr)
+opts_knit$set(root.dir = "~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data")
+data = read.csv("ozoneATL_2000.csv")
+```
+Then R remembers this working directory for all the code chunks that follow. 
+
+We can also use the full path name to get the dataset
+```{r}
+data = read.csv("~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/ozoneATL_2000.csv")
+```
+
+In R, everything is an object and every object has a _class_. We have specialized functions to manipulate, analyze, and plot different classes of objects. Some objects of data we will encounter often include data.frame, numeric, logical, matrix, and factor. We can check the class of our object using
+```{r, eval=TRUE}
+class (data)
+```
+
+We can view what objects are in the environment with 
+```{r, eval=TRUE}
+ls()
+```
+
+Here we only have an object called `data`. 
+
+**(Option 2)** If we have previously saved the R environment (in an .RData file), it can be loaded as
+```{r, eval=TRUE}
+#load("mydrive/mydirectory/OzoneATL_2000.RData")
+# since we set the directory with the special code for knit (opts_knit$set), we can load this file from the working directory:
+load("OzoneATL_2000.RData")
+ls()
+```
+	
+Alternatively, you can click on the _File_ tab, select _Load workspace_, and navigate to your file. 
+
+
+
+# Useful Resources
+-	[http://www.statmethods.net](http://www.statmethods.net)
+-	[https://science.nature.nps.gov/im/datamgmt/statistics/R/documents/R_for_SAS_SPSS_users.pdf](https://science.nature.nps.gov/im/datamgmt/statistics/R/documents/R_for_SAS_SPSS_users.pdf)
+-	Short Reference Card [http://cran.r-project.org/doc/contrib/Short-refcard.pdf](http://cran.r-project.org/doc/contrib/Short-refcard.pdf)
+-	[http://www.ats.ucla.edu/stat/r/](http://www.ats.ucla.edu/stat/r/)
+-	[http://stackoverflow.com/](http://stackoverflow.com/)
+-	[Google](http://www.google.com/)
+
