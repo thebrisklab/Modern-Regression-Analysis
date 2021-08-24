@@ -5,7 +5,11 @@ title: "R Tutorial"
 output: pdf_document
 ---
 
-R is an _open source_ software for statistical analysis, computing, and graphics [http://cran.r-project.org/](http://cran.r-project.org/). It provides a software environment where data, results, and functions are treated as objects. The users can interact directly with these objects at the command prompt. A comprehensive online introduction to R is available at [http://cran.r-project.org/doc/manuals/R-intro.html](http://cran.r-project.org/doc/manuals/R-intro.html). Sections 2 to 9 are particularly useful if you are not familiar with R.  R is a great tool to conduct analyses in a reproducible manner. R studio is a very helpful application that provides an easy interface to R, where you can create text files that conduct and document your analysis [http://www.rstudio.com/](http://www.rstudio.com/).
+R is an _open source_ software for statistical analysis, computing, and graphics [http://cran.r-project.org/](http://cran.r-project.org/). It provides a software environment where data, results, and functions are treated as objects. The users can interact directly with these objects at the command prompt. A comprehensive online introduction to R is available at [http://cran.r-project.org/doc/manuals/R-intro.html](http://cran.r-project.org/doc/manuals/R-intro.html). Sections 2 to 9 are particularly useful if you are not familiar with R.  R is a great tool to conduct analyses in a reproducible manner. 
+
+R studio is a very helpful application that provides an easy interface to R, where you can create text files that conduct and document your analysis [http://www.rstudio.com/](http://www.rstudio.com/).
+
+To compile code and text into PDF, you may need to install latex. When you try to compile this R markdown, look for errors and follow their instructions. 
 
 We will illustrate some basic operations using a dataset of daily ambient ozone concentrations and temperature in 3 Georgia counties between March and November 2000. Please download the `ozoneATL_2000.csv` and `OzoneATL_2000.RData`. You will also need to change the path names to get the code to run (as indicated below). 
 
