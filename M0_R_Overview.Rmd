@@ -32,7 +32,7 @@ library(ggplot2)
 
 ```{r, eval=TRUE}
 
-data <- read.csv ("ozoneATL_2000.csv")
+data <- read.csv ("Data/ozoneATL_2000.csv")
 ```
 
 Here we read in a csv file (`ozoneATL_2000.csv`) and assign it to an object called `data` using the right arrow (`<-`) operator. The equal sign (`=`) also works for assigning objects. If we are using R projects, then the working directory will be set to the directory containing the .Rproj file. Let's check which working directory we are using:
@@ -259,20 +259,21 @@ Now suppose we want to change our working directory. In this example, I have a s
 You will have to modify the code below to get this to work on your computer. 
 
 To change the working directory in an .R script, you use the following:
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 # When you are running code in a .R file, you can use setwd:
 setwd("~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/")
 ```
 In R markdown, you need to do this a special way. Details are below.
-```{r}
+```{r setup, eval=FALSE}
 require(knitr)
-opts_knit$set(root.dir = "~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data")
+opts_knit$set(root.dir = "~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/")
+dir()
 data = read.csv("ozoneATL_2000.csv")
 ```
 Then R remembers this working directory for all the code chunks that follow. 
 
 We can also use the full path name to get the dataset
-```{r}
+```{r, eval=FALSE}
 data = read.csv("~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/ozoneATL_2000.csv")
 ```
 
@@ -292,7 +293,7 @@ Here we only have an object called `data`.
 ```{r, eval=TRUE}
 #load("mydrive/mydirectory/OzoneATL_2000.RData")
 # since we set the directory with the special code for knit (opts_knit$set), we can load this file from the working directory:
-load("OzoneATL_2000.RData")
+load("Data/OzoneATL_2000.RData")
 ls()
 ```
 	
