@@ -3,12 +3,10 @@
 ## BIOS 526
 #####################################
 
-setwd("~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/")
-
 # Datasets used in lectures and assignments are on Canvas/Data
 
 
-dat = read.csv ("testscore.csv")
+dat = read.csv ("Data/testscore.csv")
 
 # Examine structure of dataset:
 str(dat)
@@ -36,7 +34,7 @@ dim (X); dim (Y)
 # note that solve() in R computes the inverse:
 invXtX = solve(t(X)%*%X)
 (beta = invXtX %*% t(X) %*% Y)
-# including parentheses is a trick to print the output beta
+# including parentheses is a trick to print the output
 
 plot (score~age, data = dat, xlab="Age",ylab="Score")
 abline (coef=beta, lwd = 3, col = 2)
