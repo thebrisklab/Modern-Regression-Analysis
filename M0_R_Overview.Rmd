@@ -26,6 +26,11 @@ library(ggplot2)
 
 **(Option 2)** Have RStudio do everything for you: Search for the package & click Install. Once it is installed, check the box in the package list. 
 
+# Check if a package has been installed:
+
+```{r, eval=FALSE}
+"ggplot2"%in%rownames(installed.packages())
+```
 
 # How to read in a dataset?
 **(Option 1)** To read in a comma-separated (.csv) file, use the read.csv function. If you launched this tutorial by clicking on M0_R_Overview.Rproj, this should work:  
@@ -70,7 +75,8 @@ data[ ,2]   # Second column (too much to print)
 data[2,2]   # Second row, second column
 ```
 
-Because a data frame contains variable names, we can also directly extract a variable (all records) by using the dollar (`$`) sign. 
+Because a data frame contains variable names, we can also directly extract a variable (all records) by using the dollar (`$`) sign. This also works for a list.
+
 ```{r, eval=TRUE}
 ozone = data$Ozone
 class (ozone)
@@ -133,7 +139,7 @@ x = matrix (c(1,2,3,4, 5, 6), nrow = 2, ncol = 3, byrow = T)
 x
 ```
 
-Functions such as `dim( )`, `nrow( )`, `ncol( )` can be used to obtain dimensions of a matrix. Elements of a matrix can also be extracted using the square bracket notations. Common matrix operations include transpose `t( )`, multiplication `%*%`, inverse `solve( )`, diagonal elements `diag( )`. You can also perform element-by-element arithmetic operations. 
+Functions such as `dim( )`, `nrow( )`, `ncol( )` can be used to obtain dimensions of a matrix. Elements of a matrix can also be extracted using the square bracket notations. Common matrix operations include transpose `t( )`, multiplication `%*%`, inverse `solve( )`, diagonal elements `diag( )`. You can also perform element-by-element arithmetic operations. Note: '*' is the element-by-element operation.
 
 ```{r}
 t(x)
@@ -185,6 +191,14 @@ plot (data$Ozone~data$TEMP, type = "l") #Connect the points
 plot (data$Ozone~data$TEMP, type = "h") #Show vertical lengths
 ```
 
+Note: The differences between 3 functions related to sort the data are as following:
+
+sort(): sorts the vector in an ascending order.
+rank(): gives the respective rank of the numbers present in the vector, the smallest number receiving the rank 1.
+order(): returns the indices of the vector in a sorted order.
+
+
+
 Other useful plots include: 
 ```{r, eval=TRUE}
 hist (data$Ozone)		#Plot histogram
@@ -208,6 +222,8 @@ abline (-0.030, 0.001, ## Intercept and slope of the ozone~temp best fit line
 		    lwd = 3, ## line width
 		    col = "blue") ##line color
 ```
+
+Note: abline() should be down after plot().
 
 # Alternative plotting functions
 We used base R plotting functions above. Now, let's make a plot using ggplot. GGplot is a set of functions that can produce beautiful plots, although in my opinion, the syntax is a bit more difficult than the base R plots. 
