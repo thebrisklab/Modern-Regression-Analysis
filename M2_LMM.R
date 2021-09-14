@@ -166,7 +166,7 @@ summary(fit)
 
 
 ##############
-# Slide 28
+# Slide 29
 
 # simulate data:
 tau=4
@@ -194,7 +194,7 @@ for (tau in c(0.5,4,16)) {
 #dev.off()
 
 
-# slide 29
+# slide 30
 #pdf(file='~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk/Lectures/M5-RandomIntercept/ICCPig2.pdf',width=8,height=5)
 par(mfrow=c(1,3))
 tau=4
@@ -311,7 +311,7 @@ text (mean(range(coef1)), 2.1, "Raw Estimates")
 ######################
 
 
-# Slide 43
+# Slide 49
 fit = lm (arm~age+factor(id)-1, data = nepal)
 coef1 = coef(fit)[-1]
 fit2 = lmer(arm~age+(1|id), data = nepal)
@@ -335,7 +335,7 @@ summary(fit)
 random.eff[1:2]
 
 #############
-# Slide 53
+# Slide 54
 # default is REML:
 fit.randomeffects = lmer(weight~weeks+(1|id), data = pig)
 summary(fit.randomeffects)
@@ -465,7 +465,7 @@ fix.int = coef(fit.fix)[1:p]
 fix.slope = coef(fit.fix)[(p+1):(2*p)]
 sum(fix.slope<0)
 
-
+# Slide 70
 par(mfrow=c(2,2))
 hist(fix.int,main='Fixed Subj. Intercept + Main Intercept',breaks=15)
 hist(fix.slope,main='Fixed Slope + Main Slope')
@@ -585,6 +585,7 @@ for (i in 1:500){
   lines (y~x,  col="#0000ff22", cex = 2, lwd = .5, type = "l")
 }
 
+# Slide 74
 # approximate confidence intervals using simulated values:
 lower = apply (simcurve, 2, quantile, 0.025)
 upper = apply (simcurve, 2, quantile, 0.975)
@@ -598,7 +599,7 @@ title (main = "Predicted Growth Curves for 500 Children")
 
 
 
-
+# Slide 80: 
 
 nepal$wtC = scale(nepal$wt,center=TRUE,scale=FALSE)
 fit.sexwtlit = lmer (arm~sex+lit+sex*ageC + lit*ageC + wt+ (ageC|id), data = nepal)
@@ -624,12 +625,6 @@ cor(a)
 # note the variance components decrease a little bit:
 VarCorr(fit)
 VarCorr(fit.sexwtlit)
-
-
-# note on residuals in lmm:
-head(nepal$arm - fitted(fit.sexwtlit))
-
-head(resid(fit.sexwtlit))
 
 
 
