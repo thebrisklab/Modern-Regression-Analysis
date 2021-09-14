@@ -1,4 +1,4 @@
-setwd("~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data")
+setwd("./Data")
 #setwd("C:/Users/bbr28/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2019/Data")
 
 pig = read.csv('pig.csv')[,2:4]
@@ -221,7 +221,7 @@ for (sigmasq in c(0.5,4,16)) {
 
 
 ###################
-# Slide 37
+# Slide 46
 fit.randomeffects = lmer(weight~weeks+(1|id), data = pig)
 summary(fit.randomeffects)
 random.eff = ranef(fit.randomeffects)$id[,1]
@@ -253,7 +253,7 @@ text (mean(range(coef1)), 2.1, "Raw Estimates")
 
 
 
-## Slide 38
+## Slide 47
 fit = lm (arm~age+factor(id)-1, data = nepal)
 coef1 = coef(fit)[-1]
 fit2 = lmer(arm~age+(1|id), data = nepal)
@@ -279,7 +279,7 @@ text (mean(range(coef1)), 2.1, "Raw Estimates")
 
 
 
-## Slide 39
+## Slide 48
 # add more noise (i.e., measurement error)
 set.seed(123)
 nepal$arm2 = nepal$arm + rnorm (nrow(nepal), 0, sqrt(2))
