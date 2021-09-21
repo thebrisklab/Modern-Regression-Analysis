@@ -192,7 +192,7 @@ curve(a,-4,4,main=expression(paste(beta,"=-2")),ylab='Change in E[y]')
 # Logistic regression
 # note: this dataset differs from the one used to generate the lecture slides, 
 # but the results are in general similar:
-load('~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/PTB.RData')
+load('./Data/PTB.RData')
 dat$age = dat$age - 25 # change baseline to mother's at age 25
 fit = glm(ptb~age + male+tobacco, data = dat, family = binomial(link='logit'))
 # Wald statistics:
@@ -259,7 +259,7 @@ AIC(simplefit)
 #  A study investigated the occurrence of natural (spontaneous) mutation in wild-type E. coli in the presence of an antibiotic, novobiocin, which alters the integrity of bacterial DNA. The dataset contains three variables: (1) Colony, the number of ampicillin-resistant mutant colonies; (2) Conc, the concentration of novobiocin; (3) Media, the type of media used for bacterial growth. The experiment involved two media preparations (LB and M9), 5 concentrations of novobiocin, and 100 replicates for each media-concentration combination. TNTC (too numerous to count) were recorded when the number of colonies exceeded 300.
 
  
-colonydata = read.csv('~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2019/Data/colony.csv')
+colonydata = read.csv('./Data/colony.csv')
 
 
 
@@ -275,18 +275,18 @@ colonydata$ConcByMedia = interaction(colonydata$Conc,colonydata$Media)
 
 lm_colony = lm(Colony_numeric~factor(Conc)*Media,data=colonydata)
 summary(lm_colony)
-pdf(file='~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/M3-GLM and GLMM/M3-GLM/colony_lm.pdf')
+#pdf(file='~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/M3-GLM and GLMM/M3-GLM/colony_lm.pdf')
 par(mfrow=c(2,2))
 plot(lm_colony)
-dev.off()
+#dev.off()
 # what issues do you see?
 
 glm_colony = glm(Colony_numeric~factor(Conc)*Media,data=colonydata,family = "poisson")
 summary(glm_colony)
-pdf(file='~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/M3-GLM and GLMM/M3-GLM/colony_glm.pdf')
+#pdf(file='~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/M3-GLM and GLMM/M3-GLM/colony_glm.pdf')
 par(mfrow=c(2,2))
 plot(glm_colony)
-dev.off()
+#dev.off()
 # note how residuals no longer have increasing variance
 
 
