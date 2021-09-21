@@ -601,31 +601,42 @@ title (main = "Predicted Growth Curves for 500 Children")
 
 # Slide 80: 
 
-nepal$wtC = scale(nepal$wt,center=TRUE,scale=FALSE)
+# Don't use this model:
 fit.sexwtlit = lmer (arm~sex+lit+sex*ageC + lit*ageC + wt+ (ageC|id), data = nepal)
-# if you have convergence issues:
-temp = lmer (arm~sex+lit+sex*scale(ageC) + lit*scale(ageC) + wt+ (scale(ageC)|id), data = nepal)
-summary(temp)
-
-
-
 summary(fit.sexwtlit)
+
+# NOTE: Do not use if you have convergence issues.
+# This can occur with random slopes, and scaling ageC will help.
+# We also scale and center wt, which help for interpretability
+fit.sexwtlit.scale = lmer (arm~sex+lit+sex*scale(ageC) + lit*scale(ageC) + scale(wt)+ (scale(ageC)|id), data = nepal)
+summary(fit.sexwtlit.scale)
+#NOTE: if there were no convergence issues, 
+
+summary(fit.sexwtlit.scale)
+
+
 
 
 # NOTE: The correlation output is  helpful
-# We typically see how correlations with interactions, reflects
+# We typically see how correlations with interactions reflects
 # the general issue of decreased power with interactions
 # based on the fitted model and thus reflect impacts on SE,
 # different from naive correlations:
-a = model.matrix(fit.sexwtlit)
+a = model.matrix(fit.sexwtlit.scale)
 cor(a)
 #(correlations with intercept are 0 because it is constant)
 
 
-# note the variance components decrease a little bit:
+# note the variance components decrease a little bit relative to model without additional covariates:
 VarCorr(fit)
-VarCorr(fit.sexwtlit)
+VarCorr(fit.sexwtlit.scale)
 
+
+## Alternative and equivalent specification:
+fit.sexwtlit.scale.equivalent = lmer (arm~sex+lit+sex*scale(ageC) + lit*scale(ageC) + scale(wt) + (1+scale(ageC)|id), data = nepal)
+
+summary(fit.sexwtlit.scale.equivalent)
+summary(fit.sexwtlit.scale)
 
 
 
