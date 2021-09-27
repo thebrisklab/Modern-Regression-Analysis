@@ -1,7 +1,7 @@
 ### Module 3: 
 ### Part II: glmms ###
 
-setwd('~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data')
+setwd('./Data')
 
 cbv = read.table ("2by2.txt", header = T)
 cbv[1:5,]
