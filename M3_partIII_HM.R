@@ -2,7 +2,7 @@
 ###################
 # Module 3 Part III: Hierarchical models
 ##################
-setwd('~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data')
+setwd('./Data')
 
 dat = read.csv("achievement.csv")
 
@@ -51,12 +51,28 @@ library(lmerTest)
 fit = lmer (math ~ year + retained + female + black + hispanic + size + lowinc + (1|school) + (1 | child), data = dat)
 summary(fit)
 
-#NOTE: Intercept is not meaningful: for a school with 0 students, 0 , etc.; out-of-sample estimate
+car::vif(fit)
+  
+# NOTE ON NESTING:
+  # imagine a dataset in which the child id was numbered from 1 to n_i for each school, such that
+  # child 1 and school 1 was different from child 1 at school 2, yet labeled the same.
+  # Then the NESTING structure matters, and you should do this to construct the correct
+  # random effects design matrix:
+  fit2 = lmer (math ~ year + retained + female + black + hispanic + size + lowinc + (1|school) + (1 | school:child), data = dat)
+  summary(fit2)
+  # in this dataset, each child id is unique, so these are equivalent
+
+  # TIP: check output to see if number of children is correct
+
+
+#NOTE: Intercept is not meaningful: for a school with 0 students, 0 low income... out-of-sample estimate
 mean(dat$lowinc)
 mean(dat$size)
 fit.centered = lmer (math ~ year + retained + female + black + hispanic + I(scale(size,center = TRUE,scale = FALSE)) + I(scale(lowinc,center=TRUE,scale=FALSE)) + (1|school) + (1 | child), data = dat)
 summary(fit.centered)
 # note: intercept estimate and SE changed, others are equal
+
+
 
 
 
