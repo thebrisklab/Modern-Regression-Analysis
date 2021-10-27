@@ -1,6 +1,5 @@
 # Code supporting M5: Parameteric Splines and Cross Validation
-setwd('~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/')
-load ("GAbirth.RData")
+load ("Data/GAbirth.RData")
 library(splines)
 str (dat)
 
