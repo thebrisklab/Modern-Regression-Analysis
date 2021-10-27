@@ -4,7 +4,7 @@
 
 library (splines)
 
-load ("~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/NYC.RData")
+load ("Data/NYC.RData")
 
 str (health)
 
@@ -297,7 +297,7 @@ y2 <- predict(fit.reml, newd)
 
 
 ##### GAMM (here, Gaussian)
-nepal = read.csv('~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/Nepal.csv')
+nepal = read.csv('Data/Nepal.csv')
 library(lme4)
 
 nepal$arm[ nepal$arm == 99.9] = NA
@@ -324,12 +324,10 @@ plot(fit.gamm)
 
 library(itsadug)
 plot_smooth(fit.gamm,view='age',rm.ranef=TRUE)
-# I like how this plot includes the intercept.
-
 
 # plot the first few random effects alongside the mean trend:
 myylim=c(9,18)
-plot_smooth(fit.gamm.reml,view='age',cond=list(id=10),col='orange',ylim=myylim)
-plot_smooth(fit.gamm.reml,view='age',cond=list(id=40),col='red',add=TRUE,ylim=myylim)
-plot_smooth(fit.gamm.reml,view='age',cond=list(id=120),col='purple',add=TRUE,ylim=myylim)
-plot_smooth(fit.gamm.reml,view='age',cond=list(id=50),col='turquoise',add=TRUE,ylim=myylim)
+plot_smooth(fit.gamm,view='age',cond=list(id='10'),col='orange',ylim=myylim,rm.ranef=FALSE)
+plot_smooth(fit.gamm,view='age',cond=list(id=40),col='red',add=TRUE,ylim=myylim,rm.ranef=FALSE)
+plot_smooth(fit.gamm,view='age',cond=list(id=120),col='purple',add=TRUE,ylim=myylim,rm.ranef=FALSE)
+plot_smooth(fit.gamm,view='age',cond=list(id=50),col='turquoise',add=TRUE,ylim=myylim,rm.ranef=FALSE)
