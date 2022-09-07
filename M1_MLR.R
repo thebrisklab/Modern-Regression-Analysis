@@ -123,6 +123,21 @@ set.seed(123)
 a = seq(1,10,length=1000)
 b = a+2*a*rnorm(1000)
   
+
+# homoscedasticity:
+b = a+rnorm(1000)
+model0 = lm(b~a)
+summary(model0)
+plot(model0)
+
+# non-linearity:
+b = a^2+rnorm(1000)
+model0 = lm(b~a)
+summary(model0)
+plot(model0)
+
+
+
 # Which assumption is violated?
 ##################################
 
@@ -245,11 +260,16 @@ library(emmeans)
 emmip(fit, FactorEdu ~ age, cov.reduce = range,CIs = TRUE)
 #dev.off()
 
+emmip(fit, FactorEdu ~ age, at = list(age=0),CIs = TRUE)
+
+emmip(fit, FactorEdu ~ age, at = list(age=c(0,30)),CIs = TRUE)
+
+
 # means:
 emmip(fit, FactorEdu ~ age, CIs = TRUE)
 
 # examine the CI at age = 0:
-emmip(fit, FactorEdu ~ age, at = list(age=c(0,30)),CIs = TRUE)
+emmip(fit, FactorEdu ~ age, at = list(age=c(0,22.79,30)),CIs = TRUE)
 
 
 #The average score for a child whose mother is age 22.8 and whose education level is # 2 is 11.8 points higher than a child whose mother is age 22.8 with education level 1. 
@@ -272,6 +292,25 @@ lines( predict(fit,newdata=data.frame(age=17:30,FactorEdu='4'))~c(17:30), col = 
 # F-test of interaction effect
 fit_nointer = lm(score~FactorEdu+age,data=dat)
 anova(fit_nointer,fit)
+
+
+# generally, if it were significant, we would want 
+# to determine which slopes differed. 
+# Here we show the steps to do that for educational purposed
+# (for most papers, if using alpha=0.05, we would conclude 
+# interation not significant and not do this)
+# Compare slopes, no correction for multiple comparisons
+emtrends(fit,pairwise~FactorEdu,var="age",adjust='none')
+
+# Compare slopes, correct for multiple comparisons
+emtrends(fit,pairwise~FactorEdu,var="age",adjust='bonferroni')
+
+#  Same output for centered age:
+emtrends(fit_inter_ageC,pairwise~FactorEdu,var="ageC",adjust='bonferroni')
+
+
+# Compare slopes, correct for multiple comparisons, holm's is a little more powerful
+emtrends(fit,pairwise~FactorEdu,var="age",adjust='holm')
 
     
 # linear combinations of coefficients
@@ -311,13 +350,4 @@ anova(fit_edu,fit)
 
 fit_age = lm(score~age,data=dat)
 anova(fit_age,fit)
-
-# Compare slopes, no correction for multiple comparisons
-emtrends(fit,pairwise~FactorEdu,var="age",adjust='none')
-
-# Compare slopes, correct for multiple comparisons
-emtrends(fit,pairwise~FactorEdu,var="age",adjust='bonferroni')
-
-#  Same output for centered age:
-emtrends(fit_inter_ageC,pairwise~FactorEdu,var="ageC",adjust='bonferroni')
 
