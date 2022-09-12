@@ -138,17 +138,19 @@ summary(fit.re.arms)
 random.eff.arms
 hist(random.eff.arms)
 
-    # aside: fit lmm with mgcv::gam, will be explored in Module 5
+    # aside: fit the same lmm with mgcv::gam, which has weird syntax, will be explored in Module 5
     library(mgcv)
     nepal$id2 = as.factor(nepal$id)
     fit.re.arms.check = gam(arm~age+s(id2,bs = 're'),data=nepal,method='REML')
     summary(fit.re.arms.check)    
     # they are equivalent
-        
+    # one we learn about gams, we will examine a non-linear effect of age...     
+    
+    
 # re-fit fixed effects:
 fit.fe.arms = lm(arm~age+factor(id), data = nepal)
 summary(fit.fe.arms)
-# estimates differ for affect of age from the mixed model 
+# estimates differ for effect of age from the mixed model 
 # data not balanced
 
 
