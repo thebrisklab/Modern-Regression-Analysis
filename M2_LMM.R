@@ -369,8 +369,8 @@ summary(fit)
 # See table 2 in https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf 
 
 
-lmer (arm~ scale(ageC) + (scale(ageC)|id), data = nepal)
-summary(fit)
+fit.scale = lmer (arm~ scale(ageC) + (scale(ageC)|id), data = nepal)
+summary(fit.scale)
 
 #note how it differs without centering
 temp = lmer(arm~age+(age|id),data=nepal)
@@ -410,9 +410,9 @@ fit = lmer (arm~ ageC + (ageC|id), data = nepal)
 
 # NOTE:
 # alternatively, we could fit a model with an interaction between subject and slope
-fit.fe = lm (arm~ ageC*id, data = nepal)
-summary(fit.fe) 
-fixef(fit)
+nepal$id = factor(nepal$id)
+fit.fe.default = lm (arm~ ageC*id, data = nepal)
+summary(fit.fe.default) 
 
 # but in this model, the ageC slope corresponds to slope for id1
 # recode using sum-to-zero contrasts:
