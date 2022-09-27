@@ -4,7 +4,7 @@ prob = seq(0,1,length=100)
 logitprob = log(prob/(1-prob))
 plot(logitprob~prob,type='l',col='blue',ylim=c(-8,8),ylab='logit(y)',xlab='y')
 
-y=seq(-8,8,length=100)
+y=seq(-8,8,length=100) 
 logisticy = exp(y)/(1+exp(y))
 plot(logisticy~y,type='l',col='red',xlab='x',ylab='exp(x)/(1+exp(x))')
 
@@ -18,18 +18,22 @@ plot (mu~x, type = "l", lwd = 3, xlab = "Predictor X", ylab = "E[Y_i]")
 b0 = 2; b1 = 1; eta = b0 + b1*x
 mu = exp(eta)/(1 + exp(eta))
 lines (mu~x, type = "l", col = 2, lwd = 3)
+abline(v=-2,col=2)
 
 b0 = -2; b1 = 1; eta = b0 + b1*x
 mu = exp(eta)/(1 + exp(eta))
 lines (mu~x, type = "l", col = 4, lwd = 3)
+abline(v=2,col=4)
+
 
 b0 = -3; b1 = 1; eta = b0 + b1*x
 mu = exp(eta)/(1 + exp(eta))
 lines (mu~x, type = "l", col = 3, lwd = 3)
+abline(v=3,col=3)
 
 abline(v = 0, col = "grey", lwd = 2, lty = 4)
 legend ("bottomright", c("beta0 = 0", "beta0 = 2", "beta0 = -2", "beta0 = -3"), lwd = 3, col = c(1,2,4,3), cex = 1.4, bty = "n")
-
+abline(h=0.5,col=1)
 
 ### Changes in slope, logit
 x = seq (-10, 10, by = .1)
@@ -195,6 +199,15 @@ curve(a,-4,4,main=expression(paste(beta,"=-2")),ylab='Change in E[y]')
 load('./Data/PTB.RData')
 dat$age = dat$age - 25 # change baseline to mother's at age 25
 fit = glm(ptb~age + male+tobacco, data = dat, family = binomial(link='logit'))
+
+# NOTE: glm will fit OLS if you do not specify family:
+  fit.wrong.ols.glm = glm(ptb~age + male+tobacco, data = dat)
+  summary(fit.wrong.ols.glm)
+# NOTE: What is the dispersion parameter?
+  fit.wrong.ols.lm = lm(ptb~age + male+tobacco, data = dat)
+  summary(fit.wrong.ols.lm)
+
+# Go back to the glm:  
 # Wald statistics:
 summary(fit)
 
@@ -234,15 +247,31 @@ plot(log(ptb.age/(1-ptb.age))~c(16:43), xlab="Maternal Age at Delivery", ylab="L
 #simplefit = glm(ptb~1, data = dat, family = binomial(link='logit'))
 #with(simplefit, cbind(res.deviance = deviance, df = df.residual, p = pchisq(deviance, df.residual, lower.tail=FALSE)))
 # residual deviance does not help
-# You can use a Hosmer-Lemeshow test, but we will not discuss it here.
 
 AIC(fit)
 AIC(simplefit)
 # AIC can be helpful
 
+# You can use a Hosmer-Lemeshow test,
+# which divides the predicted probabilities into 
+# bins based on quantiles, e.g., 10, and then looks 
+# at the average probability in each quantile. 
+# Then calculate an expected number of successes
+# and compares this to the observed data, from which is 
+# calculated a chi-squared statistics
 
-  
-  
+library(ResourceSelection)
+hoslem.test(x=fit$y,y=fit$fitted.values,g=10)
+
+
+  # Example where the model fits well:
+  x = rnorm(100)
+  y = rbinom(n = 100,prob = plogis(x),size=1)
+  temp.fit=glm(y~x,family=binomial)
+  hoslem.test(temp.fit$y,temp.fit$fitted.values)
+  # not significant: 
+
+
 
 # This will be part of module 5:
   library(mgcv)
@@ -303,6 +332,9 @@ glm_nomedia = glm(Colony_numeric~factor(Conc),data=colonydata,family = "poisson"
 # overall effect of Media:
 anova(glm_nomedia,glm_colony,test = 'LRT')
 
+# Poisson and overdispersion:
+# In practice, I have found the Poisson often fits data poorly. 
+# In particular, the variance is often greater than the mean. 
 # goodness of fit test based on deviance:
 with(glm_colony, cbind(res.deviance = deviance, df = df.residual, p = pchisq(deviance, df.residual, lower.tail=FALSE)))
 # p>0.05 indicates no significant lack of fit.
@@ -312,11 +344,7 @@ with(glm_nomedia, cbind(res.deviance = deviance, df = df.residual, p = pchisq(de
 # issue with lack of fit.
 
 
-# Poisson and overdispersion:
-# In practice, I have found the Poisson often fits data poorly. 
-# In particular, the variance is often greater than the mean. 
-# Test for overdispersion:
-
+# Another overdispersion test:
 #install.packages("AER")
 library(AER)
 dispersiontest(glm_colony)
@@ -348,3 +376,4 @@ sum(((colonydata$Colony_numeric - fitted(glm_colony))^2)/fitted(glm_colony))/glm
 glm_colony_quasi = glm(Colony_numeric~factor(Conc)*Media,data=colonydata,family = "quasipoisson")
 summary(glm_colony_quasi)
 
+# if in doubt, use quasipoisson (i.e., allow for overdispersion)
