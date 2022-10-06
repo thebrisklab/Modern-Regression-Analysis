@@ -31,6 +31,12 @@ table(table(dat$child))
 
 # check whether child is nested by school
 # counts whether a child is found at more than one school:
+# you can see if a factor is nested by using a cross tabulation table
+# and seeing if the level appears in only one level of the other factor
+table(dat$child,dat$school)
+
+# it's a bit hard to see with so many children and school,
+# so this code checks that each child is only at one school:
 apply(table(dat$child,dat$school)>0,1,sum)
 
 all(apply(table(dat$child,dat$school)>0,1,sum)==1)
@@ -45,6 +51,13 @@ table(dat$child,dat$retained)
 # in theory, we could look at the interaction between child and retention,
 # i.e., does the effect of retention differ between individuals. 
 # In the code below, we do not evaluate this possible interaction. 
+
+# In general, we can look at interaction between factors that are crossed
+# We can tell if two factors are crossed because a cross tabulation 
+# produces a table with non-zero entries at all combinations of factor levels.
+# E.g., sex and race
+table(dat$female, dat$black)
+
 
 # Fit multi-level mixed model:
 library(lmerTest)
@@ -79,7 +92,9 @@ summary(fit.centered)
 ### Looks at other models:
 fit2 = lmer (math ~ year + retained + female + black + hispanic + size + lowinc + (1|school) , data = dat)
 summary(fit2)
-anova(fit2,fit)
+anova(fit2,fit) # not a good test, but I don't have a better solution, 
+
+
 
 fit3 = lmer (math ~ year + retained + female + black + hispanic + size + lowinc + (1|child) , data = dat)
 summary(fit3)
@@ -89,6 +104,7 @@ anova(fit3,fit)
 # arr R:
 anova(fit2,fit3)
 # should return an error but does not.
+
 pchisq(100,0) # mass at 0
 pchisq(1,0)
 pchisq(1e-10,0)
