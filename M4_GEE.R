@@ -4,9 +4,7 @@
 # note: there are two packages for gee: gee and geepack.
 library(gee)
 args(gee)
-
-setwd('~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/')
-
+setwd('./Data')
 dat = read.csv('pig.csv')
 
 
@@ -31,11 +29,15 @@ summary(fit2)
 # Note data are balanced with same covariate for each pig
 
   # estimates differ when not balanced or covariates differ
-  dat2 = dat[sort(sample(1:nrow(dat),300,replace = FALSE)),]
-  summary(gee(weight~weeks, id=id, data=dat2, corstr='independence'))
-  summary(gee(weight~weeks, id=id, data=dat2, corstr='exchangeable'))
-
-
+  dat3 = dat
+  dat3$week = sample(c(1:9),size=nrow(dat),replace=TRUE)
+  # data are still balanced
+  table(dat3$id)
+  
+  summary(gee(weight~week, id=id, data=dat3, corstr='independence'))
+  summary(gee(weight~week, id=id, data=dat3, corstr='exchangeable'))
+  
+                     
 #AR-1
 fit3 = gee(weight~weeks, id=id, data=dat, corstr="AR-M")
 summary(fit3)
@@ -63,11 +65,11 @@ predict_gee_exchangeable = predict(fit2)
 # compare this to lmer:
 predict_lmer = predict(fit.mixed)
 
-pdf(file='~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/M4-GEE/PigPredictions.pdf')
+#pdf(file='~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/M4-GEE/PigPredictions.pdf')
 par(mfrow=c(2,1))
 plot(predict_gee_exchangeable~dat$weeks,main='GEE Predictions',ylab='Predicted value',xlab='week')
 plot(predict_lmer~dat$weeks,main='LMM Predictions',ylab='Predicted value',xlab='week')
-dev.off()
+#dev.off()
 
 
 
@@ -89,12 +91,12 @@ dat = read.table("2by2.txt",header=T)
 fit.glm = glm (outcome~trt*period,data = dat, family = binomial)
 
 ### Marginal GEE model with ind corr
-# note: set scale.fix=1 makes it equivalent to glm
-fit.ind.scale.fix = gee (outcome~trt*period, id = ID, data = dat,family = binomial (link = "logit"),  corstr = "independence", scale.fix = 1)
+# note: set scale.fix=1 makes naive se equivalent to glm
+fit.ind.scale.fix = gee::gee (outcome~trt*period, id = ID, data = dat,family = binomial (link = "logit"),  corstr = "independence", scale.fix = 1)
 
 # the default is to estimate the shape parameter
 fit.ind = gee (outcome~trt*period, id = ID, data = dat,family = binomial (link = "logit"),  corstr = "independence")
-
+# scale parameter = overdispersion parameter
 
 
 ### Marginal GEE model with exch working corr
