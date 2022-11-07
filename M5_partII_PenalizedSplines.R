@@ -294,6 +294,13 @@ y2 <- predict(fit.reml, newd)
 (y2 - y1)/2e-05
 # visually check whether this is consistent with the plot
 
+# create a plot with the scale including the intercept,
+# looks a bit nicer than the default in mgcv::gam
+# include uncertainty of intercept in confidence bands
+
+library(itsadug)
+plot_smooth(fit.reml,view='Temp',n.grid=100)
+
 
 
 ##### GAMM (here, Gaussian)
