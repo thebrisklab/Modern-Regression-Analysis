@@ -2,7 +2,7 @@
 library (mgcv)
 
 # Pre-term births with non-linear age effect
-load('~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/PTB.RData')
+load('Data/PTB.RData')
 
 fit = glm(ptb~age + male+tobacco, data = dat, family = binomial(link='logit'))
 summary(fit)
@@ -37,7 +37,7 @@ plot(fit.gam.reml)
 
 
 ## Load Data ##
-load('~/Dropbox/EmoryCourses/BIOS_526/Materials_BRisk_2020/Data/NYC.RData')
+load('Data/NYC.RData')
 health$date2=order(health$date)
 str(health)
 #dow: day of the week
@@ -113,7 +113,7 @@ summary(fit)
 cor (health[c("Temp", "DpTemp", "rmTemp", "rmDpTemp")])
 # you can look at variance inflation factors with an lm result object:
 temp=lm(log(cr65plus)~Temp + DpTemp + rmTemp + rmDpTemp,data=health)
-vif(temp)
+car::vif(temp)
 
 
 ### Temporal trends
@@ -171,7 +171,7 @@ summary(fit)
 gam.check(fit)
 cor(health[,c("pm25","date2","Temp","DpTemp","rmTemp","rmDpTemp")])
 temp=lm(log(cr65plus)~pm25+fdow+date2+Temp+DpTemp+rmTemp+rmDpTemp, data = health)
-vif(temp)
+car::vif(temp)
 # caution-- issue with collinearity. Note pm25 is okay, which is the focus here.
 
 
@@ -190,13 +190,52 @@ summary(fit)
 fit = gam(log(cr65plus)~s(pm25.lag1)+fdow+s(date2, k = 100 )+s(Temp)+ s(DpTemp)+s(rmTemp)+s(rmDpTemp), data = health)
 summary(fit)
 
-### Diagnostics
-par (mfrow = c(1,2))
-plot (resid (fit)~fit$fitted, main = "Residual vs Fitted", ylab="fitted")
+#pdf(file='PM2pt5_gamcheck.pdf')
+par(mfrow=c(2,2))
 gam.check(fit)
+#dev.off()
+
+#pdf(file='PM2pt5_plotsOfSmooths.pdf')
+par(mfrow=c(3,2))
+plot(fit)
+#dev.off()
+
+
+library(corrplot)
+#pdf(file='PM2pt5AndTemp.pdf')
+temp = health[,c('pm25.lag1','date2','Temp','DpTemp','rmTemp','rmDpTemp')]
+corrplot.mixed(cor(temp,use='complete.obs'))
+#dev.off()
+pdf(file='PM2pt5_acf.pdf')
+acf(resid(fit))
+dev.off()
+
+## check slope of PM2.5:
+newd <- health[1, ] # grab any row
+newd$pm25.lag1 <- 15 - 1e-05 # subtract some small number
+y1 <- predict(fit, newd)
+newd$pm25.lag1 <- 15 + 1e-05 # add some small number
+y2 <- predict(fit, newd)
+beta1=(y2 - y1)/2e-05
+# since edf approx 1, this is nearly constant across pm2.5
+
+100*(exp(10*beta1)-1)
+
+
+## for educational purposes, see what happens without date:
+fit.nodate = gam(log(cr65plus)~s(pm25.lag1)+fdow+s(Temp)+ s(DpTemp)+s
+                 (rmTemp)+s(rmDpTemp), data = health)
+
+pdf(file='PM2pt5_acf_nodate.pdf')
+acf(resid(fit.nodate))
+dev.off()
+
+summary(fit.nodate)
 
 
 
+################################
+#################################
 ###Temperature sensitivity
 Results = NULL
 for (df in 6:12){ print (df)
@@ -540,7 +579,7 @@ for (cut in c(41, 50, 70, 77)) {
 
 
 ### Extract effect
-# Slide 53
+# Slide 59
 X1 = predict(fit, data.frame(pm25.lag1 = 40, rmTemp=70,
                          DpTemp=0, rmDpTemp = 0, fdow = "Sunday", date2=0),type= "lpmatrix")
 X2 = predict(fit, data.frame(pm25.lag1 = 50, rmTemp=70,
@@ -554,15 +593,13 @@ X2%*%coef(fit)
 
 Est = X.diff %*% coef (fit)
 
-# Edit 21 October 2020: note: this is equal
+# another approach (but won't extend to get CIs...):
 predict(fit, data.frame(pm25.lag1 = 50, rmTemp=70,DpTemp=0, rmDpTemp = 0, fdow = "Sunday", date2=0)) - predict(fit, data.frame(pm25.lag1 = 40, rmTemp=70,DpTemp=0, rmDpTemp = 0, fdow = "Sunday", date2=0))
 
 
 predict(fit, data.frame(pm25.lag1 = 50, rmTemp=50,DpTemp=0, rmDpTemp = 0, fdow = "Sunday", date2=0)) - predict(fit, data.frame(pm25.lag1 = 40, rmTemp=50,DpTemp=0, rmDpTemp = 0, fdow = "Sunday", date2=0))
 
-
-
-
+# Estimate confidence intervals:
 # vcov extracts full covariance matrix:
 temp = vcov(fit)
 temp
@@ -617,22 +654,20 @@ anova(fit.reduced2,fit.full,test='F')
 
 # Another note: the bivariate thin plate spline is not nested in the univariate thin plate splines (the design matrices are different). 
 # an alternative is to fit the tensor, which should be nested:
-fit.full.tensor = gam(log(cr65plus)~te(pm25.lag1, rmTemp,bs='cr')+fdow+s(date2, k = 100)+s(DpTemp)+s(rmDpTemp), data = health)
-fit.reduced.tensor = gam(log(cr65plus)~s(pm25.lag1,bs='cr')+s(rmTemp,bs='cr')+fdow+s(date2, k = 100)+s(DpTemp)+s(rmDpTemp), data = health)
-anova(fit.reduced.tensor,fit.full.tensor,test='F')
-# results are similar
 
-## Updated 21 October 2020:
 ## This is the preferred way to test for interactions in a tensor spline.
 ## The "ti()" basis creates a spline such that all "main effects" are in the null space of the ti() penalty,
+## see pages 243 and the example on page 343-346.
 fit.full.tensor = gam(log(cr65plus)~s(pm25.lag1,bs='cr')+s(rmTemp,bs='cr')+ti(pm25.lag1, rmTemp,bs='cr')+fdow+s(date2, k = 100)+s(DpTemp)+s(rmDpTemp), data = health)
 summary(fit.full.tensor)
 anova(fit.full.tensor)
 
-# example using date2:
+
+
+# Anova can be used if you are removing a single smooth. Example using date2:
 fit.nodate2 = gam(log(cr65plus)~s(pm25.lag1,rmTemp)+fdow+s(DpTemp)+s(rmDpTemp), data = health)
 anova(fit.full,fit.nodate2,test='F')  
-anova(fit.nodate2,fit.full,test='F')  # doesn't matter if you switch order 
+anova(fit.nodate2,fit.full,test='F')   
 ((34.854 - 27.428)/(1798.9-1733.3)) / (27.428 / 1733.3)
 
   
